@@ -24,14 +24,26 @@ jobs:
       uses: actions-rs/clippy-check@v1.0.7
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-  test:
+  build:
     strategy:
       matrix:
-        os: [ubuntu, windows] # TODO: figure out how to enable a virtual display server for macOS
+        os: [ubuntu, windows, macos]
+        include:
+          - os: ubuntu
+            extra: --features x11
+            name: -x11
+          - os: ubuntu
+            extra: --features wayland
+            name: -wayland
     runs-on: ${{ matrix.os }}-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Run headless test
+    - name: Build
       uses: GabrielBB/xvfb-action@v1
       with:
-        run: cargo run ${{ matrix.extra }} --example ci
+        run: cargo build --release ${{ matrix.extra }} --example minimal
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v2.3.1
+      with:
+        name: build-${{ matrix.os }}${{ matrix.name }}
+        path: target/release/minimal
