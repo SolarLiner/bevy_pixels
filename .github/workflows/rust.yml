@@ -31,7 +31,11 @@ jobs:
     runs-on: ${{ matrix.os }}-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Run example
+    - name: Setup X11
+      if: ${{ matrix.os == "ubuntu" }}
       run: |
-        if [[ "${{ matrix.os }}" == "ubuntu" ]]; then xhost +; fi
-        cargo run ${{ matrix.extra }} --example ci
+        sudo apt install xvfb
+      export DISPLAY=:99.0
+      Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+    - name: Run example
+      run: cargo run ${{ matrix.extra }} --example ci
