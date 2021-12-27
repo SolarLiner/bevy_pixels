@@ -32,7 +32,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Setup X11
-      if: ${{ matrix.os == "ubuntu" }}
+      if: matrix.os == "ubuntu"
       run: |
         sudo apt install xvfb
         export DISPLAY=:99.0
